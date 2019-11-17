@@ -4,10 +4,6 @@ const http = require("http").createServer(app);
 // socket server library
 const io = require("socket.io")(http);
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello</h1>");
-});
-
 io.on("connection", socket => {
   console.log("a user connected");
   socket.on("chat message", msg => {

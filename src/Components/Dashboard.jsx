@@ -34,26 +34,30 @@ const useStyles = makeStyles(theme => ({
     width: "85%"
   },
   button: {
-    width: "15%"
+    width: "15%",
+    marginLeft: "10px"
+  },
+  chip: {
+    margin: "5px"
   }
 }));
 
 const Dashboard = () => {
   const classes = useStyles();
 
-  //CTX store of chats
+  //  CTX store of chats
   const { allChats, sendChat, user } = React.useContext(CTX);
 
   const topics = Object.keys(allChats);
 
-  //local state
+  //  local state hooks
   const [activeTopic, changeActiveTopic] = React.useState(topics[0]);
   const [textValue, changeTextValue] = React.useState("");
 
   return (
     <Paper className={classes.root}>
       <Typography variant="h3" component="h3">
-        mini-messaging
+        gabCode
       </Typography>
       <Typography variant="h5" component="h5">
         {activeTopic}
