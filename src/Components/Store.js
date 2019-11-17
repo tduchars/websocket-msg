@@ -1,20 +1,9 @@
 import React from "react";
 
-export const CTX = React.createContext();
+//  socket client connection
+import io from "socket.io-client";
 
-/*
-  {
-    from: user
-    msg: hi
-    topic: general
-  }
-  
-  state = {
-    topic1: [
-      {msg},{msg},{msg}
-    ]
-  }
-*/
+export const CTX = React.createContext();
 
 const initState = {
   javaScript: [{ from: "tony", msg: "enjoy talking about javaScript" }],
@@ -22,21 +11,49 @@ const initState = {
   SQL: [{ from: "tony", msg: "enjoy talking about SQL" }]
 };
 
+// retains existing state whilst mapping over new state and re-rendering
 function reducer(state, action) {
   const { from, msg, topic } = action.payload;
   switch (action.type) {
-    case "RECIEVE_MESSAGE":
+    case "RECEIVE_MESSAGE":
       return {
         ...state,
-        [topic]: [...state[topic], { from, msg }]
+        [topic]: [
+          ...state[topic],
+          {
+            from,
+            msg
+          }
+        ]
       };
     default:
       return state;
   }
 }
 
-export default function Store(props) {
-  const reducerHook = React.useReducer(reducer, initState);
+//  to initialise socket
+let socket;
 
-  return <CTX.Provider value={reducerHook}>{props.children}</CTX.Provider>;
+//  declared below to ensure if socket changes
+function sendChat(value) {
+  socket.emit("chat message", value);
+}
+
+export default function Store(props) {
+  const [allChats, dispatch] = React.useReducer(reducer, initState);
+
+  if (!socket) {
+    socket = io(":3001");
+    socket.on("chat message", msg => {
+      dispatch({ type: "RECEIVE_MESSAGE", payload: msg });
+    });
+  }
+
+  const user = "Tony" + Math.random(100).toFixed(2);
+
+  return (
+    <CTX.Provider value={{ allChats, sendChat, user }}>
+      {props.children}
+    </CTX.Provider>
+  );
 }
